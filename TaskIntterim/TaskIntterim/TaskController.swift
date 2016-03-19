@@ -7,50 +7,49 @@
 //
 
 import Foundation
+import CoreData
 
 class TaskController {
-    private let kTasks = "taskKey"
     static let sharedTaskController = TaskController()
-    var tasks: [Task] = []
+    var tasks: [Task] {
+        let moc = Stack.sharedStack.managedObjectContext
+        let request = NSFetchRequest(entityName: "Task")
+        do {
+            return try moc.executeFetchRequest(request) as! [Task]
+        } catch {
+            print("could not retrieve the array of Tasks")
+            return []
+        }
+    }
     
     func createTask(task: Task) {
-        // append the task to the array.
-        tasks.append(task)
         saveToPersistentStorage()
     }
     
     func deleteTask(task: Task) {
-        // Here we need equatable to find our task.
-        for (index, element) in tasks.enumerate() {
-            if task == element {
-                tasks.removeAtIndex(index)
-            }
+        if let moc = task.managedObjectContext {
+            moc.deleteObject(task)
+            self.saveToPersistentStorage()
         }
-        saveToPersistentStorage()
     }
     
     func updateTask(task: Task, withTask: Task) {
         for element in tasks {
             if element == task {
-                element.taskName = withTask.taskName
-                element.taskDueDate = withTask.taskDueDate
-                element.taskNotes = withTask.taskNotes
-                element.complete = withTask.complete
+                element.title = withTask.title
+                element.timestamp = withTask.timestamp
+                element.bodyText = withTask.bodyText
             }
         }
         saveToPersistentStorage()
     }
     
     func saveToPersistentStorage() {
-        NSKeyedArchiver.archiveRootObject(self.tasks, toFile: self.filePath(kTasks))
-    }
-    
-    func loadFromPersistentStorage() {
-        let unarchivedTasks = NSKeyedUnarchiver.unarchiveObjectWithFile(filePath(kTasks))
-        if let unarchivedTasks = unarchivedTasks as? [Task] {
-            self.tasks = unarchivedTasks
+        do {
+            try Stack.sharedStack.managedObjectContext.save()
+        } catch {
+            print("could not save")
         }
-        
     }
     
     func filePath(key: String) -> String {
@@ -62,8 +61,8 @@ class TaskController {
     
 }
 
-func ==(lhs: Task, rhs: Task) -> Bool {
-    return lhs.taskName == rhs.taskName && lhs.taskDueDate == rhs.taskDueDate && lhs.complete == rhs.complete && lhs.taskNotes == rhs.taskNotes
-}
+//func ==(lhs: Task, rhs: Task) -> Bool {
+//    return lhs.title == rhs.title && lhs.timestamp == rhs.timestamp && lhs.bodyText == rhs.bodyText
+//}
 
 // Implement NSCoding followed my Code Data.

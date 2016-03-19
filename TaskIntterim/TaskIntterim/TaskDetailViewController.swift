@@ -25,10 +25,10 @@ class TaskDetailViewController: UITableViewController {
         if let task = self.task {
             let formatter = NSDateFormatter()
             formatter.dateStyle = NSDateFormatterStyle.FullStyle
-            let formattedDate = formatter.stringFromDate((task.taskDueDate))
+            let formattedDate = formatter.stringFromDate((task.timestamp!))
             self.dueDateTextField.text = formattedDate
-            self.nameTextField.text = task.taskName
-            self.notesTextView.text = task.taskNotes
+            self.nameTextField.text = task.title
+            self.notesTextView.text = task.bodyText
         }
     }
     
@@ -52,9 +52,8 @@ class TaskDetailViewController: UITableViewController {
         formatter.dateStyle = NSDateFormatterStyle.FullStyle
         let date = formatter.dateFromString(dueDateTextField.text!)
         let dueDate = date!
-        let complete = false
         let notes = notesTextView.text
-        let task = Task(taskName: title, taskDueDate: dueDate, taskNotes: notes, complete: complete)
+        let task = Task(title: title, bodyText: notes, timestamp: dueDate)
         if let dataSourceTask = self.task {
             for element in TaskController.sharedTaskController.tasks {
                 if dataSourceTask == element {
@@ -62,7 +61,6 @@ class TaskDetailViewController: UITableViewController {
                 }
             }
         } else {
-            TaskController.sharedTaskController.tasks.append(task)
             TaskController.sharedTaskController.saveToPersistentStorage()
         }
         self.navigationController?.popViewControllerAnimated(true)

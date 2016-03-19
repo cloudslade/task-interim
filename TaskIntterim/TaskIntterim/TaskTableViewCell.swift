@@ -14,15 +14,15 @@ class TaskTableViewCell: UITableViewCell {
     @IBOutlet var completeButton: UIButton!
     
     func updateWithTask(task: Task) {
-        self.taskNameLabel.text = task.taskName
+        self.taskNameLabel.text = task.title
         let formatter = NSDateFormatter()
         formatter.dateStyle = NSDateFormatterStyle.MediumStyle
-        let formattedDate = formatter.stringFromDate(task.taskDueDate)
+        let formattedDate = formatter.stringFromDate(task.timestamp!)
         self.taskDueDateLabel.text = formattedDate
-        if task.complete {
-            self.completeButton.setImage(UIImage(named: "complete"), forState: UIControlState.Normal)
-        } else {
-            self.completeButton.setImage(UIImage(named: "incomplete"), forState: UIControlState.Normal)
-        }
+//        if task.complete {
+//            self.completeButton.setImage(UIImage(named: "complete"), forState: UIControlState.Normal)
+//        } else {
+//            self.completeButton.setImage(UIImage(named: "incomplete"), forState: UIControlState.Normal)
+//        }
     }
 }

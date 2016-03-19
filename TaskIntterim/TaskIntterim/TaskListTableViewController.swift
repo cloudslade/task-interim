@@ -9,9 +9,6 @@
 import UIKit
 
 class TaskListTableViewController: UITableViewController {
-    override func viewDidLoad() {
-        TaskController.sharedTaskController.loadFromPersistentStorage()
-    }
     
     override func viewDidAppear(animated: Bool) {
         self.tableView.reloadData()
@@ -35,6 +32,13 @@ class TaskListTableViewController: UITableViewController {
             let indexPath = self.tableView.indexPathForCell(cell)
             let task = TaskController.sharedTaskController.tasks[(indexPath?.row)!]
             dvc.task = task
+        }
+    }
+    
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == .Delete {
+            TaskController.sharedTaskController.deleteTask(TaskController.sharedTaskController.tasks[indexPath.row])
+            self.tableView.reloadData()
         }
     }
     
